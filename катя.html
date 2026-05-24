@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="мой день">
+<title>мой день</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F7F5F0;--sf:#FFF;--bd:#E8E4DC;--bd2:#F0ECE5;--ac:#8B7FD4;--al:#EEEDFE;--ad:#5A4FA0;--tx:#2A2825;--mu:#8A8680;--hi:#B5B0A8;--gbg:#E6F4EE;--gt:#2D7A58;--abg:#FEF3E2;--at:#8A5A1A;--rbg:#FCEEF2;--rt:#8A3A52;--tc:#A09898;--red:#D94F4F}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:15px}
+.app{max-width:560px;margin:0 auto;padding-bottom:3rem}
+.hdr{padding:1.75rem 1.5rem 0;margin-bottom:1.25rem}
+.hdr h1{font-size:21px;font-weight:300;letter-spacing:.04em;margin-bottom:3px}
+.hdr .dt{font-size:12px;color:var(--mu)}
+.tabs{display:flex;padding:0 1.5rem;margin-bottom:1.25rem;border-bottom:1px solid var(--bd);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:52px;padding:9px 4px;font-size:13px;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:'Jost',sans-serif;background:none;border-top:none;border-left:none;border-right:none;white-space:nowrap;text-align:center;transition:color .15s,border-color .15s}
+.tab.active{color:var(--ad);border-bottom-color:var(--ac);font-weight:500}
+.pane{display:none;padding:0 1.5rem}
+.pane.active{display:block}
+
+/* ROUTINE */
+.blk{margin-bottom:1.5rem}
+.bh{display:flex;align-items:center;gap:8px;margin-bottom:.6rem;padding-bottom:.5rem;border-bottom:1px solid var(--bd)}
+.bn{font-size:11px;font-weight:500;color:var(--mu);letter-spacing:.08em;text-transform:uppercase}
+.bt{font-size:11px;color:var(--hi)}
+.step{display:flex;align-items:flex-start;gap:10px;padding:7px 8px;border-radius:8px;cursor:pointer;transition:background .12s;user-select:none}
+.step:hover,.step:active{background:#F0EDE7}
+.step.dn .stx{color:var(--hi);text-decoration:line-through}
+.step.dn .stm,.step.dn .snt{color:var(--hi)}
+.step.dn .ck{background:var(--ac);border-color:var(--ac)}
+.step.dn .ck::after{opacity:1}
+.ck{width:18px;height:18px;min-width:18px;border-radius:50%;border:1.5px solid var(--bd);margin-top:2px;position:relative;background:var(--sf);transition:all .15s;flex-shrink:0}
+.ck::after{content:'';position:absolute;top:3px;left:5px;width:5px;height:8px;border:1.5px solid #fff;border-top:none;border-left:none;transform:rotate(45deg);opacity:0}
+.sr{flex:1;min-width:0}
+.stx{font-size:14px;color:var(--tx);line-height:1.35}
+.stm{font-size:12px;color:var(--tc);margin-top:1px}
+.snt{font-size:12px;color:var(--hi);margin-top:1px;font-style:italic}
+.pr{display:flex;justify-content:space-between;font-size:12px;color:var(--mu);margin-bottom:5px}
+.pb{height:3px;background:var(--bd);border-radius:2px;margin-bottom:1.25rem}
+.pf{height:3px;background:var(--ac);border-radius:2px;transition:width .3s}
+.rr{display:flex;justify-content:space-between;align-items:center;margin-top:.5rem}
+.lb{font-size:12px;color:var(--hi);background:none;border:none;cursor:pointer;font-family:'Jost',sans-serif;text-decoration:underline;text-underline-offset:2px}
+.lb:hover{color:var(--mu)}
+/* routine edit */
+.sact{background:none;border:none;cursor:pointer;font-size:14px;padding:3px 5px;color:var(--hi);border-radius:4px;transition:color .12s;font-family:'Jost',sans-serif;flex-shrink:0}
+.sact:hover{color:var(--tx)}
+.sact.del:hover{color:var(--red)}
+.add-s-btn{font-size:13px;color:var(--ac);background:none;border:none;cursor:pointer;font-family:'Jost',sans-serif;padding:5px 8px;display:flex;align-items:center;gap:4px;margin-top:2px;transition:color .12s}
+.add-s-btn:hover{color:var(--ad)}
+.add-sec-btn{width:100%;border:1px dashed var(--bd);border-radius:8px;padding:10px;font-size:13px;color:var(--ac);background:none;cursor:pointer;font-family:'Jost',sans-serif;margin-top:8px;transition:background .12s}
+.add-sec-btn:hover{background:var(--al)}
+.r-edit-btn{font-size:12px;color:var(--mu);background:none;border:1px solid var(--bd);border-radius:6px;padding:5px 12px;cursor:pointer;font-family:'Jost',sans-serif;transition:all .12s;white-space:nowrap}
+.r-edit-btn.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+
+/* CALENDAR */
+.cal-nav{display:flex;align-items:center;gap:8px;margin-bottom:.9rem}
+.cn-btn{background:none;border:1px solid var(--bd);border-radius:6px;width:32px;height:32px;cursor:pointer;font-size:16px;color:var(--mu);display:flex;align-items:center;justify-content:center;transition:background .12s}
+.cn-btn:hover{background:var(--bd2)}
+.cn-lbl{font-size:14px;color:var(--tx);flex:1;text-align:center}
+.td-btn{font-size:12px;color:var(--mu);background:none;border:1px solid var(--bd);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Jost',sans-serif;transition:background .12s}
+.td-btn:hover{background:var(--bd2)}
+.vt{display:flex;gap:4px;margin-bottom:1.25rem}
+.vt-btn{flex:1;padding:7px;font-size:13px;border:1px solid var(--bd);background:none;border-radius:8px;cursor:pointer;font-family:'Jost',sans-serif;color:var(--mu);transition:all .12s}
+.vt-btn.on{background:var(--tx);color:var(--sf);border-color:var(--tx)}
+.wday{margin-bottom:.75rem}
+.wdh{display:flex;align-items:center;padding:5px 0;gap:8px}
+.wdlbl{font-size:13px;font-weight:500;color:var(--mu);flex:1;letter-spacing:.03em}
+.wdlbl.today{color:var(--ac)}
+.wdadd{background:none;border:1px solid var(--bd);border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:14px;color:var(--mu);display:flex;align-items:center;justify-content:center;transition:background .12s;line-height:1;flex-shrink:0}
+.wdadd:hover{background:var(--bd2)}
+.wdev{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;cursor:pointer;margin-bottom:3px;transition:border-color .12s}
+.wdev:hover{border-color:var(--hi)}
+.wdev.wdone .wde-title{color:var(--hi);text-decoration:line-through}
+.wdev.wdone .wde-time{color:var(--hi)}
+.wdstripe{width:3px;height:100%;min-height:32px;border-radius:2px;flex-shrink:0;align-self:stretch}
+.wdebody{flex:1;min-width:0}
+.wde-title{font-size:13px;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wde-time{font-size:11px;color:var(--mu)}
+.wde-recur{font-size:10px;color:var(--hi)}
+.wdck{width:16px;height:16px;min-width:16px;border-radius:50%;border:1.5px solid var(--bd);cursor:pointer;position:relative;background:var(--sf);transition:all .15s;flex-shrink:0}
+.wdck.on{background:var(--ac);border-color:var(--ac)}
+.wdck.on::after{content:'';position:absolute;top:2px;left:4px;width:4px;height:7px;border:1.5px solid #fff;border-top:none;border-left:none;transform:rotate(45deg)}
+.wdempty{font-size:12px;color:var(--hi);padding:3px 0 6px}
+.mg-hdr{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px}
+.mg-hcell{font-size:10px;color:var(--hi);text-align:center;padding:2px}
+.mg-body{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:1rem}
+.mgcell{min-height:58px;padding:3px 2px;border-radius:6px;cursor:pointer;transition:background .12s;border:1px solid transparent}
+.mgcell:hover{background:var(--bd2)}
+.mgcell.msel{border-color:var(--ac);background:var(--al)}
+.mgcell.mtoday .mgdn{background:var(--ac);color:#fff;border-radius:50%}
+.mgcell.mother .mgdn{color:var(--hi)}
+.mgdn{font-size:12px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;margin-bottom:2px}
+.mgpill{font-size:9px;color:#fff;padding:1px 3px;border-radius:3px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5;max-width:100%}
+.mgmore{font-size:9px;color:var(--mu);padding-left:2px}
+.mday-evts{padding-top:.75rem;border-top:1px solid var(--bd)}
+.mday-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.mday-title{font-size:14px;font-weight:500;color:var(--tx)}
+.add-evt{font-size:13px;background:var(--ac);color:#fff;border:none;border-radius:20px;padding:6px 14px;cursor:pointer;font-family:'Jost',sans-serif;transition:background .15s}
+.add-evt:hover{background:var(--ad)}
+.evt-card{display:flex;align-items:flex-start;gap:8px;padding:9px 11px;background:var(--sf);border:1px solid var(--bd);border-radius:9px;cursor:pointer;margin-bottom:6px;transition:border-color .12s}
+.evt-card:hover{border-color:var(--hi)}
+.evt-card.edone .etitle,.evt-card.edone .etime{color:var(--hi)}
+.evt-card.edone .etitle{text-decoration:line-through}
+.estripe{width:3px;min-width:3px;border-radius:2px;align-self:stretch;min-height:32px}
+.ebody{flex:1;min-width:0}
+.etitle{font-size:14px;font-weight:500;color:var(--tx);line-height:1.3;margin-bottom:1px}
+.etime{font-size:12px;color:var(--mu)}
+.enote{font-size:12px;color:var(--hi);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
+.erecur{font-size:10px;color:var(--hi);margin-top:1px}
+.eck{width:18px;height:18px;min-width:18px;border-radius:50%;border:1.5px solid var(--bd);cursor:pointer;position:relative;background:var(--sf);transition:all .15s;margin-top:1px;flex-shrink:0}
+.eck.on{background:var(--ac);border-color:var(--ac)}
+.eck.on::after{content:'';position:absolute;top:3px;left:5px;width:5px;height:8px;border:1.5px solid #fff;border-top:none;border-left:none;transform:rotate(45deg)}
+.no-evts{font-size:13px;color:var(--hi);text-align:center;padding:1.25rem 0}
+
+/* TASKS */
+.atf{display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px}
+.atr{display:flex;gap:8px}
+.ti{flex:1;border:none;border-bottom:1px solid var(--bd);padding:4px 0;font-size:14px;font-family:'Jost',sans-serif;color:var(--tx);background:transparent;outline:none}
+.ti:focus{border-bottom-color:var(--ac)}
+.ti.sm{font-size:13px;color:var(--mu)}
+.ab{background:var(--ac);color:#fff;border:none;border-radius:6px;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.ab:hover{background:var(--ad)}
+.tlist{display:flex;flex-direction:column;gap:6px}
+.titem{display:flex;align-items:flex-start;gap:10px;padding:9px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:10px}
+.titem.tdone .tit{color:var(--hi);text-decoration:line-through}
+.titem.tdone .tnote{color:var(--hi)}
+.tck{width:18px;height:18px;min-width:18px;border-radius:50%;border:1.5px solid var(--bd);cursor:pointer;position:relative;background:var(--sf);transition:all .15s;margin-top:1px;flex-shrink:0}
+.tck.on{background:var(--ac);border-color:var(--ac)}
+.tck.on::after{content:'';position:absolute;top:3px;left:5px;width:5px;height:8px;border:1.5px solid #fff;border-top:none;border-left:none;transform:rotate(45deg)}
+.tbody{flex:1;min-width:0}
+.tit{font-size:14px;color:var(--tx);line-height:1.3}
+.tnote{font-size:12px;color:var(--mu);margin-top:2px}
+.tdel{background:none;border:none;cursor:pointer;color:var(--hi);font-size:16px;padding:0 2px;transition:color .12s}
+.tdel:hover{color:var(--red)}
+.tds{margin-top:1.25rem;border-top:1px solid var(--bd);padding-top:.75rem;display:none}
+.tdsl{font-size:11px;font-weight:500;color:var(--hi);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
+
+/* MENU */
+.mf{display:flex;gap:6px;flex-wrap:wrap}
+.mfb{font-size:12px;padding:4px 13px;border-radius:16px;border:1px solid var(--bd);background:none;cursor:pointer;font-family:'Jost',sans-serif;color:var(--mu);transition:all .12s}
+.mfb.on{background:var(--tx);color:var(--sf);border-color:var(--tx)}
+.rcl{display:flex;flex-direction:column;gap:8px}
+.rcard{background:var(--sf);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+.rh{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;cursor:pointer;user-select:none;gap:8px}
+.rh:hover{background:#FAFAF8}
+.rl{flex:1;min-width:0}
+.rn{font-size:14px;font-weight:500;color:var(--tx);line-height:1.3}
+.rm{display:flex;gap:8px;margin-top:4px;align-items:center;flex-wrap:wrap}
+.rtag{font-size:11px;padding:2px 8px;border-radius:10px}
+.rtb{background:var(--gbg);color:var(--gt)}
+.rtl{background:var(--abg);color:var(--at)}
+.rts{background:var(--rbg);color:var(--rt)}
+.rtm{font-size:12px;color:var(--hi)}
+.rarr{font-size:20px;color:var(--hi);transition:transform .2s;flex-shrink:0}
+.rarr.op{transform:rotate(180deg)}
+.rbody{display:none;padding:0 13px 13px;border-top:1px solid var(--bd)}
+.rbody.op{display:block}
+.rst{font-size:11px;font-weight:500;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;margin:10px 0 6px}
+.ing-list{display:flex;flex-direction:column}
+.ing{font-size:13px;color:var(--tx);display:flex;justify-content:space-between;padding:4px 0;border-bottom:.5px solid var(--bd)}
+.ing:last-child{border-bottom:none}
+.iq{color:var(--mu);font-size:13px;white-space:nowrap;padding-left:8px}
+.rstps{display:flex;flex-direction:column;gap:7px}
+.rstp{display:flex;gap:10px}
+.rsn{width:20px;height:20px;min-width:20px;border-radius:50%;background:var(--al);color:var(--ad);font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.rst2{font-size:13px;color:var(--tx);line-height:1.5}
+/* menu edit btn */
+.rec-ebtn{background:none;border:none;cursor:pointer;font-size:15px;color:var(--hi);padding:4px 6px;transition:color .12s;flex-shrink:0;line-height:1}
+.rec-ebtn:hover{color:var(--ac)}
+/* dynamic rows in recipe modal */
+.dyn-row{display:flex;gap:6px;margin-bottom:6px;align-items:center}
+.dyn-row .fi{flex:1;padding:7px 10px;font-size:13px}
+.qty-fi{max-width:90px!important}
+.dyn-rm{background:none;border:none;cursor:pointer;color:var(--hi);font-size:20px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:color .12s;padding:0;line-height:1}
+.dyn-rm:hover{color:var(--red)}
+.add-dyn{font-size:13px;color:var(--ac);background:none;border:none;cursor:pointer;font-family:'Jost',sans-serif;padding:2px 0;display:block;margin-top:2px;text-align:left}
+.add-dyn:hover{color:var(--ad)}
+.menu-top{display:flex;align-items:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+
+/* SHOPPING */
+.ss{margin-bottom:1.5rem}
+.ssh{font-size:11px;font-weight:500;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;padding-bottom:.4rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.si{display:flex;align-items:flex-start;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer;transition:background .12s;user-select:none}
+.si:hover{background:#F0EDE7}
+.si.ck .sn,.si.ck .sno,.si.ck .sq{color:var(--hi)}
+.si.ck .sn{text-decoration:line-through}
+.sqr{width:16px;height:16px;min-width:16px;border-radius:3px;border:1.5px solid var(--bd);margin-top:2px;position:relative;background:var(--sf);transition:all .15s;flex-shrink:0}
+.sqr::after{content:'';position:absolute;top:2px;left:4px;width:4px;height:7px;border:1.5px solid #fff;border-top:none;border-left:none;transform:rotate(45deg);opacity:0}
+.si.ck .sqr{background:var(--ac);border-color:var(--ac)}
+.si.ck .sqr::after{opacity:1}
+.sr2{flex:1;min-width:0}
+.sn{font-size:14px;color:var(--tx)}
+.sno{font-size:12px;color:var(--hi);margin-top:1px}
+.sq{font-size:12px;color:var(--mu);white-space:nowrap;padding-left:8px;margin-top:2px;flex-shrink:0}
+.sb{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.sp{font-size:13px;color:var(--mu)}
+.sh-del-btn{background:none;border:none;cursor:pointer;color:var(--hi);font-size:18px;padding:0 2px;flex-shrink:0;transition:color .12s;line-height:1}
+.sh-del-btn:hover{color:var(--red)}
+.sh-sec-del{background:none;border:none;cursor:pointer;color:var(--hi);font-size:16px;padding:2px 4px;line-height:1;transition:color .12s}
+.sh-sec-del:hover{color:var(--red)}
+.sh-add-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.sh-add-row input{border:1px solid var(--bd);border-radius:8px;padding:7px 10px;font-size:13px;font-family:'Jost',sans-serif;color:var(--tx);background:var(--sf);outline:none;transition:border-color .15s}
+.sh-add-row input:focus{border-color:var(--ac)}
+.sh-add-row .si-name{flex:1;min-width:100px}
+.sh-add-row .si-qty{width:80px}
+.sh-edit-btn{font-size:12px;color:var(--mu);background:none;border:1px solid var(--bd);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:'Jost',sans-serif;transition:all .12s}
+.sh-edit-btn.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+
+/* MODAL */
+.ov{display:none;position:fixed;inset:0;background:rgba(30,28,26,.45);z-index:100;align-items:flex-end;justify-content:center}
+.ov.op{display:flex}
+.modal{background:var(--sf);border-radius:16px 16px 0 0;padding:1.25rem 1.5rem 2rem;width:100%;max-width:560px;max-height:92vh;overflow-y:auto}
+.mhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.mtitle{font-size:16px;font-weight:500;color:var(--tx)}
+.mclose{background:none;border:none;cursor:pointer;font-size:22px;color:var(--mu);width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .12s}
+.mclose:hover{background:var(--bd2)}
+.fg{margin-bottom:1rem}
+.fl{font-size:12px;font-weight:500;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block}
+.fi{width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 12px;font-size:14px;font-family:'Jost',sans-serif;color:var(--tx);background:var(--bg);outline:none;transition:border-color .15s}
+.fi:focus{border-color:var(--ac)}
+textarea.fi{resize:none;min-height:70px}
+.tr{display:flex;gap:8px;align-items:center}
+.tr span{font-size:13px;color:var(--mu)}
+.adr{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
+.adr label{font-size:14px;color:var(--tx);cursor:pointer}
+.tog{position:relative;width:40px;height:22px;cursor:pointer}
+.tog input{opacity:0;width:0;height:0}
+.tog-track{position:absolute;inset:0;background:var(--bd);border-radius:11px;transition:background .2s}
+.tog input:checked~.tog-track{background:var(--ac)}
+.tog-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tog input:checked~.tog-thumb{transform:translateX(18px)}
+.cswatches{display:flex;gap:8px;flex-wrap:wrap}
+.csw{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:border-color .15s}
+.csw.sel{border-color:var(--tx)}
+.ma{display:flex;gap:8px;margin-top:1.5rem}
+.bsave{flex:1;background:var(--ac);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-family:'Jost',sans-serif;cursor:pointer;transition:background .15s}
+.bsave:hover{background:var(--ad)}
+.bdel{background:none;border:1px solid var(--bd);border-radius:8px;padding:12px 16px;font-size:14px;font-family:'Jost',sans-serif;color:var(--red);cursor:pointer;transition:background .15s}
+.bdel:hover{background:#FEF0F0}
+.dup-sec{border-top:1px solid var(--bd);margin-top:1rem;padding-top:1rem;display:none}
+.dup-sec.vis{display:block}
+.dup-lbl{font-size:12px;font-weight:500;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem}
+.dup-dates{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.ddr{display:flex;gap:6px;align-items:center}
+.ddr .fi{flex:1}
+.ddrm{background:none;border:none;cursor:pointer;color:var(--hi);font-size:18px;width:26px;height:26px;display:flex;align-items:center;justify-content:center}
+.ddrm:hover{color:var(--red)}
+.add-dd{font-size:13px;color:var(--ac);background:none;border:none;cursor:pointer;font-family:'Jost',sans-serif;padding:0;margin-bottom:8px;display:block}
+.bdup{width:100%;background:var(--al);color:var(--ad);border:1px solid var(--ac);border-radius:8px;padding:10px;font-size:13px;font-family:'Jost',sans-serif;cursor:pointer;transition:background .12s}
+.bdup:hover{background:#E0DCFF}
+/* tags row in recipe modal */
+.tag-checks{display:flex;gap:12px;flex-wrap:wrap}
+.tag-checks label{display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer;color:var(--tx)}
+
+/* JOURNAL */
+.jnav{display:flex;align-items:center;gap:8px;margin-bottom:1.25rem}
+.jnbtn{background:none;border:1px solid var(--bd);border-radius:6px;width:32px;height:32px;cursor:pointer;font-size:16px;color:var(--mu);display:flex;align-items:center;justify-content:center;transition:background .12s}
+.jnbtn:hover{background:var(--bd2)}
+.jdlbl{font-size:14px;color:var(--tx);flex:1;text-align:center;font-weight:500}
+.jtd{font-size:12px;color:var(--mu);background:none;border:1px solid var(--bd);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Jost',sans-serif}
+.jsec-title{font-size:11px;font-weight:500;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
+.mblock{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px 13px;margin-bottom:8px}
+.mblock-name{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:8px}
+.moptions{display:flex;gap:6px;flex-wrap:wrap}
+.mopt{padding:5px 11px;border-radius:20px;border:1px solid var(--bd);background:none;cursor:pointer;font-size:13px;font-family:'Jost',sans-serif;color:var(--mu);transition:all .12s;display:flex;align-items:center;gap:4px}
+.mopt:hover{border-color:var(--hi)}
+.mopt.sel{border-color:transparent;color:#fff;font-weight:500}
+.jtext{width:100%;border:1px solid var(--bd);border-radius:10px;padding:12px;font-size:14px;font-family:'Jost',sans-serif;color:var(--tx);background:var(--sf);outline:none;resize:none;min-height:160px;line-height:1.6;transition:border-color .15s}
+.jtext:focus{border-color:var(--ac)}
+.jsave-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.jsaved{font-size:12px;color:var(--hi);font-style:italic}
+.jsbtn{background:var(--ac);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-family:'Jost',sans-serif;cursor:pointer;transition:background .15s}
+.jsbtn:hover{background:var(--ad)}
+/* emotion multi-select */
+.em-section{margin-bottom:6px;border-radius:10px;overflow:hidden;border:1px solid var(--bd);background:var(--sf)}
+.em-cat-hdr{display:flex;align-items:center;gap:8px;padding:10px 13px;cursor:pointer;user-select:none;transition:background .1s}
+.em-cat-hdr:hover{background:var(--bd2)}
+.em-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.em-cat-name{font-size:13px;font-weight:500;color:var(--tx);flex:1}
+.em-cnt{font-size:11px;padding:2px 7px;border-radius:10px;color:#fff}
+.em-arr{font-size:18px;color:var(--hi);transition:transform .2s;line-height:1;flex-shrink:0}
+.em-arr.op{transform:rotate(180deg)}
+.em-pills-wrap{display:flex;flex-wrap:wrap;gap:5px;padding:10px 13px;border-top:1px solid var(--bd2)}
+.em-pill{padding:5px 11px;border-radius:16px;border:1px solid var(--bd);background:none;cursor:pointer;font-size:13px;font-family:'Jost',sans-serif;color:var(--mu);transition:all .12s}
+.em-pill:hover{border-color:var(--hi);color:var(--tx)}
+.em-sel-summary{display:flex;flex-wrap:wrap;gap:4px;padding:9px 11px;background:var(--bd2);border-radius:10px;margin-bottom:8px}
+.em-chip{font-size:12px;padding:3px 9px;border-radius:12px;color:#fff;cursor:pointer;transition:opacity .12s;border:none;font-family:'Jost',sans-serif}
+.em-chip:hover{opacity:.8}
+/* thoughts & fears */
+.tf-block{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px 13px;margin-bottom:8px}
+.tf-block-name{font-size:13px;font-weight:500;color:var(--tx);margin-bottom:8px}
+.tf-pills{display:flex;flex-wrap:wrap;gap:5px}
+.tf-pill{padding:5px 11px;border-radius:16px;border:1px solid var(--bd);background:none;cursor:pointer;font-size:13px;font-family:'Jost',sans-serif;color:var(--mu);transition:all .12s}
+.tf-pill:hover{border-color:var(--hi);color:var(--tx)}
+.tf-pill.sel{color:#fff;border-color:transparent;font-weight:500}
+/* habits */
+.habit-manage{display:flex;gap:8px;margin-bottom:1rem}
+.hname-in{flex:1;border:1px solid var(--bd);border-radius:8px;padding:8px 12px;font-size:14px;font-family:'Jost',sans-serif;color:var(--tx);background:var(--sf);outline:none;transition:border-color .15s}
+.hname-in:focus{border-color:var(--ac)}
+.hadd-btn{background:var(--ac);color:#fff;border:none;border-radius:8px;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.hadd-btn:hover{background:var(--ad)}
+.habit-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px 13px;margin-bottom:8px}
+.hcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.hcard-left{flex:1}
+.hcard-name{font-size:14px;font-weight:500;color:var(--tx)}
+.hcard-streak{font-size:12px;color:var(--mu);margin-top:1px}
+.hdel{background:none;border:none;cursor:pointer;color:var(--hi);font-size:18px;font-family:'Jost',sans-serif;padding:0 2px}
+.hdel:hover{color:var(--red)}
+.dot-grid{display:flex;flex-wrap:wrap;gap:5px}
+.hdot{width:20px;height:20px;border-radius:5px;background:var(--bd);cursor:pointer;transition:background .12s;border:none;flex-shrink:0}
+.hdot:hover:not(.future){background:var(--hi)}
+.hdot.done{background:var(--ac)}
+.hdot.today-dot{outline:2px solid var(--ac);outline-offset:1px}
+.hdot.future{opacity:.3;cursor:default;pointer-events:none}
+.dot-tip{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:rgba(42,40,37,.9);color:#fff;font-size:13px;padding:7px 14px;border-radius:8px;z-index:500;pointer-events:none;white-space:nowrap;font-family:'Jost',sans-serif}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hdr"><h1>мой день</h1><div class="dt" id="hdt"></div></div>
+  <div class="tabs">
+    <button class="tab active" onclick="sw('routine',this)">рутина</button>
+    <button class="tab" onclick="sw('cal',this)">неделя</button>
+    <button class="tab" onclick="sw('tasks',this)">задачи</button>
+    <button class="tab" onclick="sw('menu',this)">меню</button>
+    <button class="tab" onclick="sw('shop',this)">покупки</button>
+    <button class="tab" onclick="sw('journal',this)">дневник</button>
+  </div>
+
+  <!-- ROUTINE -->
+  <div class="pane active" id="pane-routine">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+      <div class="pr" style="margin-bottom:0;flex:1"><span id="rdt"></span><span id="rpct"></span></div>
+      <button class="r-edit-btn" id="r-edit-btn" onclick="togRoutineEdit()">✏ изменить</button>
+    </div>
+    <div class="pb"><div class="pf" id="pf" style="width:0%"></div></div>
+    <div id="rblks"></div>
+    <div class="rr">
+      <button class="lb" onclick="resetR()">сбросить день</button>
+    </div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="pane" id="pane-cal">
+    <div class="cal-nav">
+      <button class="cn-btn" onclick="navBack()">‹</button>
+      <span class="cn-lbl" id="cnlbl"></span>
+      <button class="cn-btn" onclick="navFwd()">›</button>
+      <button class="td-btn" onclick="goToday()">сегодня</button>
+    </div>
+    <div class="vt">
+      <button class="vt-btn on" id="vt-week" onclick="setView('week')">неделя</button>
+      <button class="vt-btn" id="vt-month" onclick="setView('month')">месяц</button>
+    </div>
+    <div id="week-con"></div>
+    <div id="month-con" style="display:none">
+      <div class="mg-hdr" id="mg-hdr"></div>
+      <div class="mg-body" id="mg-body"></div>
+      <div class="mday-evts">
+        <div class="mday-hdr">
+          <span class="mday-title" id="mday-title"></span>
+          <button class="add-evt" onclick="openModal(null)">+ событие</button>
+        </div>
+        <div id="mday-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASKS -->
+  <div class="pane" id="pane-tasks">
+    <div class="atf">
+      <div class="atr">
+        <input class="ti" id="ti-t" placeholder="новая задача..." onkeydown="if(event.key==='Enter')addTodo()">
+        <button class="ab" onclick="addTodo()">+</button>
+      </div>
+      <input class="ti sm" id="ti-n" placeholder="заметка (необязательно)">
+    </div>
+    <div class="tlist" id="tlist"></div>
+    <div class="tds" id="tds"><div class="tdsl">выполнено</div><div class="tlist" id="tdlist"></div></div>
+  </div>
+
+  <!-- MENU -->
+  <div class="pane" id="pane-menu">
+    <div class="menu-top">
+      <div class="mf" id="mf"></div>
+      <button class="add-evt" onclick="openRecModal(null)" style="flex-shrink:0;margin-left:auto">+ блюдо</button>
+    </div>
+    <div class="rcl" id="rcl"></div>
+  </div>
+
+  <!-- SHOPPING -->
+  <div class="pane" id="pane-shop">
+    <div class="sb">
+      <span class="sp" id="sp"></span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="lb" onclick="resetShop()">сбросить</button>
+        <button class="sh-edit-btn" id="sh-edit-btn" onclick="togShopEdit()">✏ изменить</button>
+      </div>
+    </div>
+    <div id="shoplist"></div>
+  </div>
+</div>
+
+<!-- JOURNAL (outside .app to keep original structure) -->
+<div class="pane" id="pane-journal" style="max-width:560px;margin:0 auto;padding:0 1.5rem">
+  <div class="jnav">
+    <button class="jnbtn" onclick="jShift(-1)">‹</button>
+    <span class="jdlbl" id="jdlbl"></span>
+    <button class="jnbtn" onclick="jShift(1)">›</button>
+    <button class="jtd" onclick="jGoToday()">сегодня</button>
+  </div>
+  <div class="jsec-title">эмоции</div>
+  <div id="mood-blocks"></div>
+  <div class="jsec-title" style="margin-top:1.25rem">мысли</div>
+  <textarea class="jtext" id="jtext" placeholder="напиши всё что хочешь..."></textarea>
+  <div class="jsave-row">
+    <span class="jsaved" id="jsaved"></span>
+    <button class="jsbtn" onclick="saveJournal()">сохранить</button>
+  </div>
+  <div class="jsec-title" style="margin-top:1.75rem">привычки</div>
+  <div class="habit-manage">
+    <input class="hname-in" id="hname-in" placeholder="новая привычка..." onkeydown="if(event.key==='Enter')addHabit()">
+    <button class="hadd-btn" onclick="addHabit()">+</button>
+  </div>
+  <div id="habits-con"></div>
+</div>
+
+<div class="dot-tip" id="dot-tip" style="display:none"></div>
+
+<!-- EVENT MODAL -->
+<div class="ov" id="ov" onclick="ovClick(event)">
+  <div class="modal">
+    <div class="mhdr"><span class="mtitle" id="mtitle">новое событие</span><button class="mclose" onclick="closeModal()">×</button></div>
+    <div class="fg"><label class="fl">название</label><input class="fi" id="f-title" placeholder="название события"></div>
+    <div class="fg"><label class="fl">дата</label><input class="fi" id="f-date" type="date"></div>
+    <div class="adr">
+      <label class="tog"><input type="checkbox" id="f-ad" onchange="togAD()"><span class="tog-track"></span><span class="tog-thumb"></span></label>
+      <label for="f-ad">весь день</label>
+    </div>
+    <div class="fg" id="time-g">
+      <label class="fl">время</label>
+      <div class="tr"><input class="fi" id="f-ts" type="time" style="flex:1"><span>—</span><input class="fi" id="f-te" type="time" style="flex:1"></div>
+    </div>
+    <div class="fg"><label class="fl">цвет</label><div class="cswatches" id="csw"></div></div>
+    <div class="fg"><label class="fl">уведомление</label>
+      <select class="fi" id="f-notif">
+        <option value="-1">нет</option><option value="0">в момент события</option>
+        <option value="15">за 15 минут</option><option value="30">за 30 минут</option>
+        <option value="60">за 1 час</option><option value="120">за 2 часа</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">повторять</label>
+      <select class="fi" id="f-recur" onchange="togRecurEnd()">
+        <option value="">нет</option><option value="daily">каждый день</option>
+        <option value="weekdays">по будням (пн–пт)</option><option value="weekly">каждую неделю</option>
+        <option value="monthly">каждый месяц</option>
+      </select>
+    </div>
+    <div class="fg" id="recur-end-g" style="display:none">
+      <label class="fl">повторять до</label><input class="fi" id="f-re" type="date">
+    </div>
+    <div class="fg"><label class="fl">заметка</label><textarea class="fi" id="f-note" placeholder="заметка..."></textarea></div>
+    <div class="dup-sec" id="dup-sec">
+      <div class="dup-lbl">дублировать на другие дни</div>
+      <div class="dup-dates" id="dup-dates"></div>
+      <button class="add-dd" onclick="addDupDate()">+ добавить дату</button>
+      <button class="bdup" onclick="createCopies()">создать копии</button>
+    </div>
+    <div class="ma">
+      <button class="bsave" onclick="saveEvt()">сохранить</button>
+      <button class="bdel" id="bdel" onclick="delEvt()" style="display:none">удалить</button>
+    </div>
+  </div>
+</div>
+
+<!-- RECIPE MODAL -->
+<div class="ov" id="ov-rec" onclick="ovRecClick(event)">
+  <div class="modal">
+    <div class="mhdr"><span class="mtitle" id="rec-modal-title">новое блюдо</span><button class="mclose" onclick="closeRecModal()">×</button></div>
+    <div class="fg"><label class="fl">название</label><input class="fi" id="rm-name" placeholder="название блюда"></div>
+    <div class="fg">
+      <label class="fl">категория</label>
+      <div class="tag-checks" id="rm-tags">
+        <label><input type="checkbox" value="завтрак"> завтрак</label>
+        <label><input type="checkbox" value="обед"> обед</label>
+        <label><input type="checkbox" value="ужин"> ужин</label>
+        <label><input type="checkbox" value="перекус"> перекус</label>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">время</label><input class="fi" id="rm-time" placeholder="20 мин"></div>
+    <div class="fg">
+      <label class="fl">ингредиенты</label>
+      <div id="rm-ings"></div>
+      <button class="add-dyn" onclick="addIngRow()">+ ингредиент</button>
+    </div>
+    <div class="fg">
+      <label class="fl">шаги приготовления</label>
+      <div id="rm-steps"></div>
+      <button class="add-dyn" onclick="addStepRowM()">+ шаг</button>
+    </div>
+    <div class="ma">
+      <button class="bsave" onclick="saveRecipeMod()">сохранить</button>
+      <button class="bdel" id="rm-del" onclick="deleteRecipeMod()" style="display:none">удалить</button>
+    </div>
+  </div>
+</div>
+
+<!-- STEP MODAL (routine) -->
+<div class="ov" id="ov-step" onclick="ovStepClick(event)">
+  <div class="modal">
+    <div class="mhdr"><span class="mtitle" id="step-modal-title">шаг</span><button class="mclose" onclick="closeStepModal()">×</button></div>
+    <div class="fg"><label class="fl">текст</label><input class="fi" id="sm-text" placeholder="описание шага"></div>
+    <div class="fg"><label class="fl">время</label><input class="fi" id="sm-time" placeholder="09:00"></div>
+    <div class="fg"><label class="fl">заметка (необязательно)</label><input class="fi" id="sm-note" placeholder="уточнение..."></div>
+    <div class="ma"><button class="bsave" onclick="saveStepMod()">сохранить</button></div>
+  </div>
+</div>
+
+<!-- SECTION MODAL (routine) -->
+<div class="ov" id="ov-secm" onclick="ovSecmClick(event)">
+  <div class="modal">
+    <div class="mhdr"><span class="mtitle" id="sec-modal-title">раздел</span><button class="mclose" onclick="closeSecModal()">×</button></div>
+    <div class="fg"><label class="fl">название</label><input class="fi" id="secm-name" placeholder="утро"></div>
+    <div class="fg"><label class="fl">время (необязательно)</label><input class="fi" id="secm-range" placeholder="09:00 – 11:00"></div>
+    <div class="ma"><button class="bsave" onclick="saveSecMod()">сохранить</button></div>
+  </div>
+</div>
+
+<script>
+// ── UTILS ──────────────────────────────────────────────
+const MR=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const MS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+const DF=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+const DA2=['пн','вт','ср','чт','пт','сб','вс'];
+function fd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function td(){return fd(new Date())}
+function pd(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
+const now0=new Date();
+document.getElementById('hdt').textContent=DF[now0.getDay()]+', '+now0.getDate()+' '+MR[now0.getMonth()];
+const TK=now0.toDateString();
+if(localStorage.getItem('rd')!==TK){localStorage.removeItem('rs');localStorage.setItem('rd',TK);}
+function sw(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='cal')renderCal();
+  if(id==='tasks')renderTasks();
+  if(id==='journal'){renderJournal();renderHabits();}
+}
+
+// ── ROUTINE ────────────────────────────────────────────
+const DEFAULT_RB=[
+  {name:'утро',range:'09:00 – 11:30',steps:[
+    {id:'w1',text:'проснуться, сесть на кровати',time:'09:00',note:'одно движение — просто сесть'},
+    {id:'w2',text:'выпить таблетки',time:'09:01'},
+    {id:'w2b',text:'застелить кровать',time:'09:03'},
+    {id:'w3',text:'умыться — лицо, руки',time:'09:05'},
+    {id:'w4',text:'одеться',time:'09:10'},
+    {id:'w5',text:'одеть собаку',time:'09:15'},
+    {id:'w6',text:'прогулка с собакой — 1 час',time:'09:20 – 10:20'},
+    {id:'w7',text:'поменять воду собаке',time:'10:20'},
+    {id:'w8',text:'покормить собаку',time:'10:22'},
+    {id:'w9',text:'убрать лоток кота',time:'10:25'},
+    {id:'w10',text:'насыпать корм коту',time:'10:27'},
+    {id:'w11',text:'приготовить и съесть завтрак',time:'10:30 – 11:00'},
+    {id:'w12',text:'душ / помыть голову',time:'11:00 – 11:20'},
+  ]},
+  {name:'перед выходом',range:'11:30 – 13:00',steps:[
+    {id:'m1',text:'доделать дз / распечатать нужное',time:'11:30 – 12:20',note:'если нет — пропускай'},
+    {id:'m2',text:'проверить всё ли взяла',time:'12:20'},
+    {id:'m3',text:'выйти из дома',time:'не позже 12:30',note:'цель — быть в универе к 13:20'},
+  ]},
+  {name:'вечер',range:'19:00 – 23:00',steps:[
+    {id:'e0',text:'покормить собаку',time:'19:00'},
+    {id:'e1',text:'поужинать',time:'19:10 – 19:40'},
+    {id:'e2',text:'одеть собаку',time:'19:40'},
+    {id:'e3',text:'вечерняя прогулка с собакой — 1 час',time:'19:45 – 20:45'},
+    {id:'e4',text:'покормить собаку',time:'20:45'},
+    {id:'e5',text:'покормить кота',time:'20:47'},
+    {id:'e6',text:'убрать лоток кота',time:'20:50'},
+    {id:'e6b',text:'уборка',time:'21:00 – 21:30'},
+    {id:'e7',text:'задачи по учёбе',time:'21:30 – 22:00'},
+    {id:'e8',text:'перекусить',time:'22:00'},
+    {id:'e8b',text:'душ',time:'22:10 – 22:25'},
+    {id:'e9',text:'почистить зубы',time:'22:25'},
+    {id:'e10',text:'лечь спать',time:'22:30 – 23:00'},
+  ]},
+];
+function getRB(){try{const d=JSON.parse(localStorage.getItem('rb_data'));return d||JSON.parse(JSON.stringify(DEFAULT_RB));}catch(e){return JSON.parse(JSON.stringify(DEFAULT_RB));}}
+function saveRBData(d){localStorage.setItem('rb_data',JSON.stringify(d));}
+let RS=JSON.parse(localStorage.getItem('rs')||'{}');
+function saveR(){localStorage.setItem('rs',JSON.stringify(RS));}
+let routineEM=false;
+let stepModalData={secIdx:null,stepIdx:null};
+let secModalData=null;
+
+function togRoutineEdit(){
+  routineEM=!routineEM;
+  const btn=document.getElementById('r-edit-btn');
+  btn.textContent=routineEM?'✓ готово':'✏ изменить';
+  btn.classList.toggle('on',routineEM);
+  renderR();
+}
+
+function renderR(){
+  const RB=getRB();
+  const c=document.getElementById('rblks');c.innerHTML='';
+  let tot=0,dn=0;
+  RB.forEach((b,bi)=>{
+    const div=document.createElement('div');div.className='blk';
+    const bhEl=document.createElement('div');bhEl.className='bh';
+    bhEl.innerHTML=`<span class="bn">${b.name}</span><span class="bt" style="margin-left:auto">${b.range||''}</span>`;
+    if(routineEM){
+      const acts=document.createElement('div');acts.style.display='flex';acts.style.gap='2px';acts.style.marginLeft='8px';
+      const eBtn=document.createElement('button');eBtn.className='sact';eBtn.textContent='✎';eBtn.title='изменить раздел';eBtn.onclick=()=>openSecModal(bi);
+      const dBtn=document.createElement('button');dBtn.className='sact del';dBtn.textContent='×';dBtn.title='удалить раздел';dBtn.onclick=()=>delSec(bi);
+      acts.appendChild(eBtn);acts.appendChild(dBtn);bhEl.appendChild(acts);
+    }
+    div.appendChild(bhEl);
+    b.steps.forEach((s,si)=>{
+      tot++;if(RS[s.id])dn++;
+      const el=document.createElement('div');
+      el.className='step'+(RS[s.id]?' dn':'');
+      if(!routineEM){
+        el.tabIndex=0;
+        el.onclick=()=>{RS[s.id]=!RS[s.id];saveR();renderR();};
+        el.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();el.click();}};
+      } else {
+        el.style.cursor='default';
+      }
+      el.innerHTML=`<div class="ck"></div><div class="sr"><div class="stx">${s.text}</div><div class="stm">${s.time||''}</div>${s.note?`<div class="snt">${s.note}</div>`:''}</div>`;
+      if(routineEM){
+        const sa=document.createElement('div');sa.style.display='flex';sa.style.gap='2px';sa.style.marginLeft='auto';sa.style.flexShrink='0';
+        const e2=document.createElement('button');e2.className='sact';e2.textContent='✎';e2.onclick=(ev)=>{ev.stopPropagation();openStepModal(bi,si);};
+        const d2=document.createElement('button');d2.className='sact del';d2.textContent='×';d2.onclick=(ev)=>{ev.stopPropagation();delStep(bi,si);};
+        sa.appendChild(e2);sa.appendChild(d2);el.appendChild(sa);
+      }
+      div.appendChild(el);
+    });
+    if(routineEM){
+      const addBtn=document.createElement('button');addBtn.className='add-s-btn';addBtn.innerHTML='+ шаг';
+      addBtn.onclick=()=>openStepModal(bi,null);div.appendChild(addBtn);
+    }
+    c.appendChild(div);
+  });
+  if(routineEM){
+    const addSec=document.createElement('button');addSec.className='add-sec-btn';addSec.textContent='+ новый раздел';
+    addSec.onclick=()=>openSecModal(null);c.appendChild(addSec);
+  }
+  const p=tot?Math.round(dn/tot*100):0;
+  document.getElementById('pf').style.width=p+'%';
+  document.getElementById('rdt').textContent=dn+' из '+tot;
+  document.getElementById('rpct').textContent=p+'%';
+}
+function resetR(){RS={};saveR();renderR();}
+renderR();
+
+// step modal
+function openStepModal(secIdx,stepIdx){
+  stepModalData={secIdx,stepIdx};
+  const RB=getRB();
+  const isNew=stepIdx===null;
+  document.getElementById('step-modal-title').textContent=isNew?'новый шаг':'изменить шаг';
+  if(!isNew){const s=RB[secIdx].steps[stepIdx];document.getElementById('sm-text').value=s.text||'';document.getElementById('sm-time').value=s.time||'';document.getElementById('sm-note').value=s.note||'';}
+  else{document.getElementById('sm-text').value='';document.getElementById('sm-time').value='';document.getElementById('sm-note').value='';}
+  document.getElementById('ov-step').classList.add('op');
+  setTimeout(()=>document.getElementById('sm-text').focus(),100);
+}
+function closeStepModal(){document.getElementById('ov-step').classList.remove('op');}
+function ovStepClick(e){if(e.target===document.getElementById('ov-step'))closeStepModal();}
+function saveStepMod(){
+  const text=document.getElementById('sm-text').value.trim();if(!text)return;
+  const time=document.getElementById('sm-time').value.trim();
+  const note=document.getElementById('sm-note').value.trim();
+  const RB=getRB();const{secIdx,stepIdx}=stepModalData;
+  if(stepIdx===null){RB[secIdx].steps.push({id:'s'+Date.now(),text,time,note:note||undefined});}
+  else{const s=RB[secIdx].steps[stepIdx];RB[secIdx].steps[stepIdx]={id:s.id,text,time,note:note||undefined};}
+  saveRBData(RB);closeStepModal();renderR();
+}
+function delStep(secIdx,stepIdx){
+  if(!confirm('удалить шаг?'))return;
+  const RB=getRB();RB[secIdx].steps.splice(stepIdx,1);saveRBData(RB);renderR();
+}
+// section modal
+function openSecModal(secIdx){
+  secModalData=secIdx;
+  const RB=getRB();const isNew=secIdx===null;
+  document.getElementById('sec-modal-title').textContent=isNew?'новый раздел':'изменить раздел';
+  if(!isNew){document.getElementById('secm-name').value=RB[secIdx].name||'';document.getElementById('secm-range').value=RB[secIdx].range||'';}
+  else{document.getElementById('secm-name').value='';document.getElementById('secm-range').value='';}
+  document.getElementById('ov-secm').classList.add('op');
+  setTimeout(()=>document.getElementById('secm-name').focus(),100);
+}
+function closeSecModal(){document.getElementById('ov-secm').classList.remove('op');}
+function ovSecmClick(e){if(e.target===document.getElementById('ov-secm'))closeSecModal();}
+function saveSecMod(){
+  const name=document.getElementById('secm-name').value.trim();if(!name)return;
+  const range=document.getElementById('secm-range').value.trim();
+  const RB=getRB();
+  if(secModalData===null){RB.push({name,range,steps:[]});}
+  else{RB[secModalData].name=name;RB[secModalData].range=range;}
+  saveRBData(RB);closeSecModal();renderR();
+}
+function delSec(secIdx){
+  if(!confirm('удалить раздел и все шаги в нём?'))return;
+  const RB=getRB();RB.splice(secIdx,1);saveRBData(RB);renderR();
+}
+
+// ── CALENDAR ────────────────────────────────────────────
+const COLORS=['#8B7FD4','#E05C5C','#E8924A','#D4B942','#4CAF7A','#4A90D4','#D4608B','#4ABCBC'];
+const RECUR_LABELS={daily:'каждый день',weekdays:'по будням',weekly:'каждую неделю',monthly:'каждый месяц'};
+function getEvts(){try{return JSON.parse(localStorage.getItem('events')||'[]');}catch(e){return[];}}
+function saveEvts(e){localStorage.setItem('events',JSON.stringify(e));}
+let calView='week',weekOff=0,monthOff=0,selDate=td();
+let editId=null,selColor=COLORS[0];
+function evtsForDate(ds){
+  const all=getEvts();const res=[];const target=pd(ds);
+  all.forEach(evt=>{
+    if(evt.date===ds){res.push({...evt});return;}
+    if(!evt.recur)return;
+    const base=pd(evt.date);
+    if(target.getTime()<=base.getTime())return;
+    if(evt.recurEnd&&target>pd(evt.recurEnd))return;
+    if(evt.done)return;
+    let ok=false;const dow=target.getDay();
+    switch(evt.recur){case'daily':ok=true;break;case'weekdays':ok=dow>=1&&dow<=5;break;case'weekly':ok=dow===base.getDay();break;case'monthly':ok=target.getDate()===base.getDate();break;}
+    if(ok)res.push({...evt,date:ds,_r:true,_bid:evt.id});
+  });
+  return res.sort((a,b)=>{if(a.allDay&&!b.allDay)return -1;if(!a.allDay&&b.allDay)return 1;return(a.timeStart||'').localeCompare(b.timeStart||'');});
+}
+function getWeekDays(off){
+  const d=new Date();const dow=d.getDay();const mon=new Date(d);
+  mon.setDate(d.getDate()-(dow===0?6:dow-1)+off*7);
+  const days=[];for(let i=0;i<7;i++){const dd=new Date(mon);dd.setDate(mon.getDate()+i);days.push(dd);}return days;
+}
+function navBack(){if(calView==='week')weekOff--;else monthOff--;renderCal();}
+function navFwd(){if(calView==='week')weekOff++;else monthOff++;renderCal();}
+function goToday(){weekOff=0;monthOff=0;selDate=td();renderCal();}
+function setView(v){
+  calView=v;
+  document.getElementById('vt-week').classList.toggle('on',v==='week');
+  document.getElementById('vt-month').classList.toggle('on',v==='month');
+  document.getElementById('week-con').style.display=v==='week'?'block':'none';
+  document.getElementById('month-con').style.display=v==='month'?'block':'none';
+  renderCal();
+}
+function renderCal(){if(calView==='week')renderWeek();else renderMonth();}
+function renderWeek(){
+  const days=getWeekDays(weekOff);const today=td();
+  const f=days[0],l=days[6];const sm=f.getMonth()===l.getMonth();
+  document.getElementById('cnlbl').textContent=sm?f.getDate()+' – '+l.getDate()+' '+MS[f.getMonth()]+' '+f.getFullYear():f.getDate()+' '+MS[f.getMonth()]+' – '+l.getDate()+' '+MS[l.getMonth()]+' '+l.getFullYear();
+  const con=document.getElementById('week-con');con.innerHTML='';
+  days.forEach(d=>{
+    const ds=fd(d);const evts=evtsForDate(ds);const isToday=ds===today;
+    const div=document.createElement('div');div.className='wday';
+    const dayLabel=DA2[d.getDay()===0?6:d.getDay()-1];
+    div.innerHTML=`<div class="wdh"><span class="wdlbl${isToday?' today':''}">${dayLabel.toUpperCase()} · ${d.getDate()} ${MS[d.getMonth()]}</span><button class="wdadd" onclick="openModal(null,'${ds}')">+</button></div>`;
+    if(evts.length){
+      evts.forEach(evt=>{
+        const isDone=evt.done;const el=document.createElement('div');el.className='wdev'+(isDone?' wdone':'');
+        const timeLbl=evt.allDay?'весь день':(evt.timeStart||'')+(evt.timeEnd?' – '+evt.timeEnd:'');
+        const recurLbl=evt._r?'↻ '+RECUR_LABELS[evt.recur]:'';
+        el.innerHTML=`<div class="wdstripe" style="background:${evt.color||COLORS[0]}"></div><div class="wdebody"><div class="wde-title">${evt.title}</div><div class="wde-time">${timeLbl}</div>${recurLbl?`<div class="wde-recur">${recurLbl}</div>`:''}</div>${!evt._r?`<div class="wdck${isDone?' on':''}" onclick="togDone('${evt.id}',event)"></div>`:''}`;
+        el.querySelector('.wdebody').onclick=()=>openModal(evt._r?evt._bid:evt.id);div.appendChild(el);
+      });
+    }else{const em=document.createElement('div');em.className='wdempty';em.textContent='нет событий';div.appendChild(em);}
+    con.appendChild(div);
+  });
+}
+function renderMonth(){
+  const d0=new Date(now0.getFullYear(),now0.getMonth()+monthOff,1);
+  const yr=d0.getFullYear(),mo=d0.getMonth();
+  document.getElementById('cnlbl').textContent=MS[mo].charAt(0).toUpperCase()+MS[mo].slice(1)+' '+yr;
+  const hdr=document.getElementById('mg-hdr');hdr.innerHTML='';
+  DA2.forEach(d=>{const c=document.createElement('div');c.className='mg-hcell';c.textContent=d;hdr.appendChild(c);});
+  const first=new Date(yr,mo,1);const fdow=first.getDay();const mondayOff=fdow===0?-6:1-fdow;
+  const start=new Date(first);start.setDate(1+mondayOff);const today=td();
+  const body=document.getElementById('mg-body');body.innerHTML='';
+  for(let i=0;i<42;i++){
+    const cd=new Date(start);cd.setDate(start.getDate()+i);const ds=fd(cd);
+    const isThisMonth=cd.getMonth()===mo;const isToday=ds===today;const isSel=ds===selDate;const evts=evtsForDate(ds);
+    const cell=document.createElement('div');cell.className='mgcell'+(isToday?' mtoday':'')+(isSel?' msel':'')+(isThisMonth?'':' mother');
+    let inner=`<div class="mgdn">${cd.getDate()}</div>`;
+    evts.slice(0,2).forEach(e=>{inner+=`<div class="mgpill" style="background:${e.color||COLORS[0]}">${e.title}</div>`;});
+    if(evts.length>2)inner+=`<div class="mgmore">+${evts.length-2}</div>`;
+    cell.innerHTML=inner;cell.onclick=()=>{selDate=ds;renderMonth();};body.appendChild(cell);
+  }
+  const ssel=pd(selDate);
+  document.getElementById('mday-title').textContent=ssel.getDate()+' '+MR[ssel.getMonth()]+', '+DF[ssel.getDay()];
+  renderDayList(document.getElementById('mday-list'),selDate);
+}
+function renderDayList(container,ds){
+  container.innerHTML='';const evts=evtsForDate(ds);
+  if(!evts.length){container.innerHTML='<div class="no-evts">нет событий на этот день</div>';return;}
+  evts.forEach(evt=>{
+    const card=document.createElement('div');card.className='evt-card'+(evt.done?' edone':'');
+    const timeLbl=evt.allDay?'весь день':(evt.timeStart||'')+(evt.timeEnd?' – '+evt.timeEnd:'');
+    const recurLbl=evt._r?'↻ '+RECUR_LABELS[evt.recur]:'';
+    card.innerHTML=`<div class="estripe" style="background:${evt.color||COLORS[0]}"></div><div class="ebody"><div class="etitle">${evt.title}</div><div class="etime">${timeLbl}</div>${evt.note?`<div class="enote">${evt.note}</div>`:''}${recurLbl?`<div class="erecur">${recurLbl}</div>`:''}</div>${!evt._r?`<div class="eck${evt.done?' on':''}" onclick="togDoneEvt('${evt.id}',event)"></div>`:''}`;
+    card.querySelector('.ebody').onclick=()=>openModal(evt._r?evt._bid:evt.id);container.appendChild(card);
+  });
+}
+function togDone(id,e){e&&e.stopPropagation();const evts=getEvts();const i=evts.findIndex(x=>x.id===id);if(i>=0){evts[i].done=!evts[i].done;saveEvts(evts);renderCal();}}
+function togDoneEvt(id,e){togDone(id,e);}
+function renderSwatches(){
+  const c=document.getElementById('csw');c.innerHTML='';
+  COLORS.forEach(col=>{const s=document.createElement('div');s.className='csw'+(col===selColor?' sel':'');s.style.background=col;s.onclick=()=>{selColor=col;renderSwatches();};c.appendChild(s);});
+}
+function openModal(id,defaultDate){
+  editId=id;
+  document.getElementById('mtitle').textContent=id?'редактировать':'новое событие';
+  document.getElementById('bdel').style.display=id?'block':'none';
+  document.getElementById('dup-sec').classList.toggle('vis',!!id);
+  document.getElementById('dup-dates').innerHTML='';
+  if(id){const evt=getEvts().find(e=>e.id===id);if(!evt)return;document.getElementById('f-title').value=evt.title||'';document.getElementById('f-date').value=evt.date||td();document.getElementById('f-ad').checked=evt.allDay||false;document.getElementById('f-ts').value=evt.timeStart||'';document.getElementById('f-te').value=evt.timeEnd||'';document.getElementById('f-notif').value=String(evt.notification??-1);document.getElementById('f-recur').value=evt.recur||'';document.getElementById('f-re').value=evt.recurEnd||'';document.getElementById('f-note').value=evt.note||'';selColor=evt.color||COLORS[0];}
+  else{document.getElementById('f-title').value='';document.getElementById('f-date').value=defaultDate||selDate;document.getElementById('f-ad').checked=false;document.getElementById('f-ts').value='';document.getElementById('f-te').value='';document.getElementById('f-notif').value='-1';document.getElementById('f-recur').value='';document.getElementById('f-re').value='';document.getElementById('f-note').value='';selColor=COLORS[0];}
+  renderSwatches();togAD();togRecurEnd();
+  document.getElementById('ov').classList.add('op');
+  setTimeout(()=>document.getElementById('f-title').focus(),100);
+}
+function togAD(){document.getElementById('time-g').style.display=document.getElementById('f-ad').checked?'none':'block';}
+function togRecurEnd(){document.getElementById('recur-end-g').style.display=document.getElementById('f-recur').value?'block':'none';}
+function closeModal(){document.getElementById('ov').classList.remove('op');}
+function ovClick(e){if(e.target===document.getElementById('ov'))closeModal();}
+function saveEvt(){
+  const title=document.getElementById('f-title').value.trim();if(!title){document.getElementById('f-title').focus();return;}
+  const evts=getEvts();
+  const evt={id:editId||('e'+Date.now()),title,date:document.getElementById('f-date').value||td(),allDay:document.getElementById('f-ad').checked,timeStart:document.getElementById('f-ts').value||null,timeEnd:document.getElementById('f-te').value||null,color:selColor,notification:parseInt(document.getElementById('f-notif').value),recur:document.getElementById('f-recur').value||null,recurEnd:document.getElementById('f-re').value||null,note:document.getElementById('f-note').value.trim(),done:editId?(evts.find(e=>e.id===editId)||{}).done||false:false};
+  if(editId){const i=evts.findIndex(e=>e.id===editId);if(i>=0)evts[i]=evt;else evts.push(evt);}else evts.push(evt);
+  saveEvts(evts);scheduleNotifs();closeModal();selDate=evt.date;renderCal();
+}
+function delEvt(){if(!editId)return;saveEvts(getEvts().filter(e=>e.id!==editId));closeModal();renderCal();}
+function addDupDate(){
+  const cont=document.getElementById('dup-dates');const row=document.createElement('div');row.className='ddr';
+  const inp=document.createElement('input');inp.type='date';inp.className='fi';inp.value=td();
+  const btn=document.createElement('button');btn.className='ddrm';btn.innerHTML='×';btn.onclick=()=>row.remove();
+  row.appendChild(inp);row.appendChild(btn);cont.appendChild(row);
+}
+function createCopies(){
+  if(!editId)return;const base=getEvts().find(e=>e.id===editId);if(!base)return;
+  const inputs=document.querySelectorAll('#dup-dates input[type=date]');if(!inputs.length){alert('добавь хотя бы одну дату');return;}
+  const evts=getEvts();let added=0;
+  inputs.forEach(inp=>{const ds=inp.value;if(!ds||ds===base.date)return;evts.push({...base,id:'e'+Date.now()+Math.random(),date:ds,done:false,recur:null,recurEnd:null});added++;});
+  saveEvts(evts);closeModal();renderCal();if(added)alert(`создано копий: ${added}`);
+}
+async function askNotif(){if('Notification'in window&&Notification.permission==='default')await Notification.requestPermission();}
+async function scheduleNotifs(){
+  if(!('Notification'in window)||Notification.permission!=='granted')return;
+  const evts=evtsForDate(td()).filter(e=>e.notification!==-1&&!e.done&&e.timeStart);
+  let reg=null;if('serviceWorker'in navigator){try{reg=await navigator.serviceWorker.ready;}catch(ex){}}
+  evts.forEach(evt=>{
+    const[h,m]=evt.timeStart.split(':').map(Number);const et=new Date();et.setHours(h,m,0,0);
+    const notAt=evt.notification>0?et.getTime()-evt.notification*60000:et.getTime();
+    const delay=notAt-Date.now();if(delay<0)return;
+    setTimeout(()=>{const o={body:evt.note||evt.timeStart};try{if(reg)reg.showNotification(evt.title,o);else new Notification(evt.title,o);}catch(ex){}},delay);
+  });
+}
+
+// ── TASKS ──────────────────────────────────────────────
+function getTodos(){try{return JSON.parse(localStorage.getItem('todos')||'[]');}catch(e){return[];}}
+function saveTodos(t){localStorage.setItem('todos',JSON.stringify(t));}
+function addTodo(){
+  const title=document.getElementById('ti-t').value.trim();if(!title)return;
+  const note=document.getElementById('ti-n').value.trim();
+  const todos=getTodos();todos.unshift({id:'t'+Date.now(),title,note,done:false});
+  saveTodos(todos);document.getElementById('ti-t').value='';document.getElementById('ti-n').value='';renderTasks();
+}
+function togTodo(id){const t=getTodos();const i=t.findIndex(x=>x.id===id);if(i>=0){t[i].done=!t[i].done;saveTodos(t);renderTasks();}}
+function delTodo(id){saveTodos(getTodos().filter(t=>t.id!==id));renderTasks();}
+function renderTasks(){
+  const todos=getTodos();
+  const mkEl=t=>{
+    const el=document.createElement('div');el.className='titem'+(t.done?' tdone':'');
+    el.innerHTML=`<div class="tck${t.done?' on':''}" onclick="togTodo('${t.id}')"></div><div class="tbody"><div class="tit">${t.title}</div>${t.note?`<div class="tnote">${t.note}</div>`:''}</div><button class="tdel" onclick="delTodo('${t.id}')">×</button>`;
+    return el;
+  };
+  const al=document.getElementById('tlist');al.innerHTML='';
+  todos.filter(t=>!t.done).forEach(t=>al.appendChild(mkEl(t)));
+  const ds=document.getElementById('tds');const dl=document.getElementById('tdlist');dl.innerHTML='';
+  const done=todos.filter(t=>t.done);
+  if(done.length){ds.style.display='block';done.forEach(t=>dl.appendChild(mkEl(t)));}else ds.style.display='none';
+}
+renderTasks();
+
+// ── MENU ───────────────────────────────────────────────
+const DEFAULT_RECIPES=[
+  {id:'r1',name:'овсянка с бананом и арахисовой пастой',tags:['завтрак'],time:'5 мин',ingredients:[{name:'овсянка быстрая',qty:'5 ст.л.'},{name:'вода или молоко',qty:'200 мл'},{name:'банан',qty:'1 шт'},{name:'арахисовая паста',qty:'1 ст.л.'},{name:'мёд',qty:'по желанию'}],steps:['Залить овсянку горячей водой или молоком, накрыть тарелкой на 3 минуты.','Нарезать банан кружочками, выложить сверху.','Добавить арахисовую пасту и мёд.']},
+  {id:'r2',name:'манная каша',tags:['завтрак'],time:'10 мин',ingredients:[{name:'манная крупа',qty:'3 ст.л.'},{name:'молоко',qty:'300 мл'},{name:'сливочное масло',qty:'1 ч.л.'},{name:'сахар',qty:'1 ч.л.'},{name:'соль',qty:'щепотка'}],steps:['Влить молоко в кастрюлю, поставить на средний огонь.','Когда начнёт закипать — всыпать манку тонкой струйкой, постоянно мешая.','Варить 3–5 минут до загустения.','Добавить масло, сахар, соль. Дать постоять минуту.']},
+  {id:'r3',name:'сырники',tags:['завтрак'],time:'20 мин',ingredients:[{name:'творог жирный',qty:'300 г'},{name:'мука',qty:'3 ст.л.'},{name:'яйцо',qty:'1 шт'},{name:'сахар',qty:'1 ст.л.'},{name:'соль',qty:'щепотка'}],steps:['Смешать творог, яйцо, сахар и соль вилкой.','Добавить муку, перемешать.','Слепить лепёшки, обвалять в муке.','Жарить по 3–4 мин с каждой стороны.']},
+  {id:'r4',name:'творог с фруктами и орехами',tags:['завтрак'],time:'3 мин',ingredients:[{name:'творог',qty:'150–200 г'},{name:'фрукты или ягоды',qty:'горсть'},{name:'орехи',qty:'горсть'},{name:'мёд',qty:'1 ч.л.'}],steps:['Выложить творог в миску.','Добавить фрукты или ягоды.','Посыпать орехами, полить мёдом.']},
+  {id:'r5',name:'блинчики',tags:['завтрак'],time:'20 мин',ingredients:[{name:'мука',qty:'1 стакан'},{name:'молоко',qty:'2 стакана'},{name:'яйца',qty:'2 шт'},{name:'сахар',qty:'1 ст.л.'},{name:'масло растительное',qty:'1 ст.л.'}],steps:['Смешать яйца, молоко, сахар и соль.','Всыпать муку, перемешать без комков. Добавить масло.','Жарить на разогретой сковороде по ~1 мин с каждой стороны.']},
+  {id:'r6',name:'яичница с помидорами и сыром',tags:['завтрак'],time:'7 мин',ingredients:[{name:'яйца',qty:'2–3 шт'},{name:'помидор',qty:'1 шт'},{name:'сыр тёртый',qty:'2 ст.л.'},{name:'соль, перец',qty:'по вкусу'}],steps:['Обжарить нарезанный помидор 1–2 мин.','Вбить яйца, посолить, накрыть крышкой на 2–3 мин.','Посыпать сыром, снять с огня.']},
+  {id:'r7',name:'паста с курицей и томатным соусом',tags:['обед','ужин'],time:'20 мин',ingredients:[{name:'паста',qty:'100–120 г'},{name:'куриная грудка',qty:'150–200 г'},{name:'томатный соус',qty:'150 мл'},{name:'чеснок',qty:'1 зубчик'},{name:'масло оливковое',qty:'1 ст.л.'}],steps:['Поставить воду для пасты, посолить.','Курицу нарезать, обжарить 5–7 мин.','Добавить чеснок и томатный соус, потушить 3 мин.','Сварить пасту, слить воду, смешать с соусом.']},
+  {id:'r8',name:'рис с курицей и замороженными овощами',tags:['обед','ужин'],time:'25 мин',ingredients:[{name:'рис',qty:'0.5 стакана'},{name:'куриная грудка',qty:'150–200 г'},{name:'замороженные овощи',qty:'150 г'},{name:'соевый соус',qty:'1 ст.л.'}],steps:['Рис промыть, залить 1:2 водой, варить 18 мин под крышкой.','Курицу обжарить 5–7 мин.','Добавить овощи, жарить 5 мин. Добавить соевый соус.']},
+  {id:'r9',name:'гречка с грибами и луком',tags:['обед','ужин'],time:'25 мин',ingredients:[{name:'гречка',qty:'0.5 стакана'},{name:'шампиньоны',qty:'150–200 г'},{name:'лук',qty:'1 шт'},{name:'масло',qty:'1 ст.л.'}],steps:['Гречку промыть, залить 1:2, варить 15–18 мин.','Лук обжарить 3 мин, добавить грибы, жарить 7–8 мин.','Смешать с гречкой, посолить.']},
+  {id:'r10',name:'суп из красной чечевицы',tags:['обед','ужин'],time:'25 мин',ingredients:[{name:'красная чечевица',qty:'0.5 стакана'},{name:'морковь',qty:'1 шт'},{name:'лук',qty:'1 шт'},{name:'вода',qty:'600 мл'},{name:'куркума, паприка',qty:'по щепотке'}],steps:['Лук и морковь обжарить 3 мин.','Добавить чечевицу и специи, залить водой, довести до кипения.','Варить 15 мин. Посолить.']},
+  {id:'r11',name:'картошка запечённая с сыром',tags:['обед','ужин'],time:'40 мин',ingredients:[{name:'картофель',qty:'3–4 шт'},{name:'сыр тёртый',qty:'50 г'},{name:'масло оливковое',qty:'1 ст.л.'},{name:'соль, паприка',qty:'по вкусу'}],steps:['Духовку на 200°С.','Картошку нарезать дольками, полить маслом, посолить.','Запекать 30 мин, посыпать сыром, ещё 5 мин.']},
+  {id:'r12',name:'тортилья с курицей и сыром',tags:['обед','ужин'],time:'10 мин',ingredients:[{name:'лаваш / тортилья',qty:'1 шт'},{name:'куриная грудка (готовая)',qty:'100–150 г'},{name:'сыр тёртый',qty:'2 ст.л.'}],steps:['Выложить курицу и сыр на лаваш.','Свернуть, поджарить на сухой сковороде по 2 мин с каждой стороны.']},
+  {id:'r13',name:'куриный бульон с лапшой',tags:['обед','ужин'],time:'30 мин',ingredients:[{name:'куриная грудка',qty:'200 г'},{name:'вода',qty:'700 мл'},{name:'лапша',qty:'40–50 г'},{name:'морковь',qty:'1 шт'},{name:'соль, лавровый лист',qty:'по вкусу'}],steps:['Залить курицу водой, довести до кипения, снять пену.','Добавить морковь, соль, лавровый лист. Варить 20 мин.','Нарезать курицу, вернуть в бульон. Добавить лапшу, варить 5–7 мин.']},
+  {id:'r14',name:'банан или яблоко с арахисовой пастой',tags:['перекус'],time:'2 мин',ingredients:[{name:'банан или яблоко',qty:'1 шт'},{name:'арахисовая паста',qty:'1–2 ст.л.'}],steps:['Нарезать фрукт дольками.','Обмакивать в арахисовую пасту.']},
+  {id:'r15',name:'хумус с овощами и лавашом',tags:['перекус'],time:'3 мин',ingredients:[{name:'хумус',qty:'3–4 ст.л.'},{name:'огурец',qty:'0.5 шт'},{name:'морковь',qty:'1 шт'},{name:'лаваш',qty:'несколько кусочков'}],steps:['Выложить хумус в миску.','Нарезать овощи палочками, подавать с лавашом.']},
+  {id:'r16',name:'тост с сыром',tags:['перекус'],time:'3 мин',ingredients:[{name:'хлеб / тост',qty:'1–2 ломтика'},{name:'сыр',qty:'1–2 ломтика'}],steps:['Поджарить хлеб.','Выложить сыр, подержать до расплавления.']},
+];
+function getRecipes(){try{const d=JSON.parse(localStorage.getItem('recipes_data'));return d||JSON.parse(JSON.stringify(DEFAULT_RECIPES));}catch(e){return JSON.parse(JSON.stringify(DEFAULT_RECIPES));}}
+function saveRecipes(r){localStorage.setItem('recipes_data',JSON.stringify(r));}
+const TC={завтрак:'rtb',обед:'rtl',ужин:'rtl',перекус:'rts'};
+const MC=['все','завтрак','обед','ужин','перекус'];
+let aMCat='все',openRec=null,editingRecId=null;
+function renderMF(){
+  const f=document.getElementById('mf');f.innerHTML='';
+  MC.forEach(c=>{const b=document.createElement('button');b.className='mfb'+(c===aMCat?' on':'');b.textContent=c;b.onclick=()=>{aMCat=c;renderMF();renderRec();};f.appendChild(b);});
+}
+function renderRec(){
+  const RECIPES=getRecipes();const list=document.getElementById('rcl');list.innerHTML='';
+  const fil=aMCat==='все'?RECIPES:RECIPES.filter(r=>r.tags&&r.tags.includes(aMCat));
+  if(!fil.length){list.innerHTML='<div style="font-size:13px;color:var(--hi);text-align:center;padding:1.5rem">нет блюд</div>';return;}
+  fil.forEach(r=>{
+    const card=document.createElement('div');card.className='rcard';
+    const isO=openRec===r.id;
+    const header=document.createElement('div');header.className='rh';
+    header.innerHTML=`<div class="rl"><div class="rn">${r.name}</div><div class="rm">${(r.tags||[]).map(t=>`<span class="rtag ${TC[t]||'rtb'}">${t}</span>`).join('')}<span class="rtm">${r.time||''}</span></div></div><button class="rec-ebtn" title="редактировать">✎</button><div class="rarr${isO?' op':''}">⌄</div>`;
+    header.querySelector('.rec-ebtn').onclick=(e)=>{e.stopPropagation();openRecModal(r.id);};
+    header.querySelector('.rl').onclick=()=>togRec(r.id);
+    header.querySelector('.rarr').onclick=()=>togRec(r.id);
+    card.appendChild(header);
+    if(isO){
+      const body=document.createElement('div');body.className='rbody op';
+      body.innerHTML=`<div class="rst">ингредиенты</div><div class="ing-list">${(r.ingredients||[]).map(i=>`<div class="ing"><span>${i.name}</span><span class="iq">${i.qty||''}</span></div>`).join('')}</div><div class="rst">приготовление</div><div class="rstps">${(r.steps||[]).map((s,i)=>`<div class="rstp"><div class="rsn">${i+1}</div><div class="rst2">${s}</div></div>`).join('')}</div>`;
+      card.appendChild(body);
+    }
+    list.appendChild(card);
+  });
+}
+function togRec(id){openRec=openRec===id?null:id;renderRec();}
+// recipe modal
+function openRecModal(id){
+  editingRecId=id;
+  document.getElementById('rm-name').value='';document.getElementById('rm-time').value='';
+  document.querySelectorAll('#rm-tags input[type=checkbox]').forEach(cb=>cb.checked=false);
+  document.getElementById('rm-ings').innerHTML='';document.getElementById('rm-steps').innerHTML='';
+  document.getElementById('rm-del').style.display='none';
+  if(id){
+    const r=getRecipes().find(x=>x.id===id);if(!r)return;
+    document.getElementById('rec-modal-title').textContent='редактировать блюдо';
+    document.getElementById('rm-name').value=r.name||'';
+    document.getElementById('rm-time').value=r.time||'';
+    (r.tags||[]).forEach(t=>{const cb=document.querySelector(`#rm-tags input[value="${t}"]`);if(cb)cb.checked=true;});
+    (r.ingredients||[]).forEach(ing=>addIngRow(ing.name,ing.qty||''));
+    (r.steps||[]).forEach(s=>addStepRowM(s));
+    document.getElementById('rm-del').style.display='block';
+  } else {
+    document.getElementById('rec-modal-title').textContent='новое блюдо';
+    addIngRow();addStepRowM();
+  }
+  document.getElementById('ov-rec').classList.add('op');
+  setTimeout(()=>document.getElementById('rm-name').focus(),100);
+}
+function closeRecModal(){document.getElementById('ov-rec').classList.remove('op');}
+function ovRecClick(e){if(e.target===document.getElementById('ov-rec'))closeRecModal();}
+function addIngRow(name='',qty=''){
+  const row=document.createElement('div');row.className='dyn-row';
+  row.innerHTML=`<input class="fi" placeholder="ингредиент" value="${escQ(name)}" style="flex:1"><input class="fi qty-fi" placeholder="кол-во" value="${escQ(qty)}" style="max-width:90px"><button class="dyn-rm" type="button">×</button>`;
+  row.querySelector('.dyn-rm').onclick=()=>row.remove();
+  document.getElementById('rm-ings').appendChild(row);
+}
+function addStepRowM(text=''){
+  const row=document.createElement('div');row.className='dyn-row';
+  row.innerHTML=`<input class="fi" placeholder="описание шага" value="${escQ(text)}" style="flex:1"><button class="dyn-rm" type="button">×</button>`;
+  row.querySelector('.dyn-rm').onclick=()=>row.remove();
+  document.getElementById('rm-steps').appendChild(row);
+}
+function escQ(s){return(s||'').replace(/"/g,'&quot;');}
+function saveRecipeMod(){
+  const name=document.getElementById('rm-name').value.trim();if(!name)return;
+  const time=document.getElementById('rm-time').value.trim();
+  const tags=[...document.querySelectorAll('#rm-tags input[type=checkbox]:checked')].map(cb=>cb.value);
+  const ings=[...document.querySelectorAll('#rm-ings .dyn-row')].map(row=>{const ins=row.querySelectorAll('input');return{name:ins[0].value.trim(),qty:ins[1].value.trim()};}).filter(i=>i.name);
+  const steps=[...document.querySelectorAll('#rm-steps .dyn-row')].map(row=>row.querySelector('input').value.trim()).filter(Boolean);
+  const RECIPES=getRecipes();
+  if(editingRecId){const idx=RECIPES.findIndex(r=>r.id===editingRecId);if(idx>=0)RECIPES[idx]={...RECIPES[idx],name,time,tags,ingredients:ings,steps};}
+  else RECIPES.push({id:'r'+Date.now(),name,time,tags,ingredients:ings,steps});
+  saveRecipes(RECIPES);closeRecModal();openRec=null;renderRec();
+}
+function deleteRecipeMod(){
+  if(!editingRecId||!confirm('удалить блюдо?'))return;
+  saveRecipes(getRecipes().filter(r=>r.id!==editingRecId));
+  closeRecModal();openRec=null;renderRec();
+}
+renderMF();renderRec();
+
+// ── SHOPPING ───────────────────────────────────────────
+const DEFAULT_SHOP=[
+  {id:'sec1',name:'белок',items:[{id:'sh1',name:'куриная грудка',qty:'800–1000 г',note:'на 3–4 дня, запечь сразу'},{id:'sh2',name:'творог жирный',qty:'400 г',note:'сырники и перекусы'},{id:'sh3',name:'яйца',qty:'1 десяток',note:'блинчики, сырники, яичница'},{id:'sh4',name:'сыр твёрдый',qty:'200 г',note:'яичница, тортилья'}]},
+  {id:'sec2',name:'крупы, паста, мука',items:[{id:'sh5',name:'овсянка быстрая',qty:'500 г'},{id:'sh6',name:'манная крупа',qty:'300 г'},{id:'sh7',name:'гречка',qty:'400 г'},{id:'sh8',name:'рис',qty:'500 г'},{id:'sh9',name:'красная чечевица',qty:'400 г'},{id:'sh10',name:'паста',qty:'400 г'},{id:'sh11',name:'лапша / вермишель',qty:'200 г'},{id:'sh12',name:'мука',qty:'500 г'},{id:'sh13',name:'картофель',qty:'1 кг'},{id:'sh14',name:'лаваш / тортилья',qty:'1 упаковка'},{id:'sh15',name:'хлеб / тосты',qty:'1 пачка'}]},
+  {id:'sec3',name:'молочное',items:[{id:'sh16',name:'молоко',qty:'1 л'},{id:'sh17',name:'сливочное масло',qty:'100 г'}]},
+  {id:'sec4',name:'овощи и фрукты',items:[{id:'sh18',name:'помидоры',qty:'4–5 штук'},{id:'sh19',name:'огурцы',qty:'3–4 штуки'},{id:'sh20',name:'морковь',qty:'4–5 штук'},{id:'sh21',name:'лук репчатый',qty:'4–5 штук'},{id:'sh22',name:'чеснок',qty:'1 головка'},{id:'sh23',name:'бананы',qty:'5–6 штук'},{id:'sh24',name:'яблоки',qty:'4–5 штук'},{id:'sh25',name:'шампиньоны',qty:'300 г'},{id:'sh26',name:'замороженные овощи',qty:'500 г'},{id:'sh27',name:'ягоды замороженные',qty:'300 г'}]},
+  {id:'sec5',name:'готовое / из банки',items:[{id:'sh28',name:'хумус готовый',qty:'1 баночка'},{id:'sh29',name:'томатный соус',qty:'2 банки'}]},
+  {id:'sec6',name:'базовые запасы',items:[{id:'sh30',name:'арахисовая паста'},{id:'sh31',name:'мёд'},{id:'sh32',name:'орехи',qty:'небольшая упаковка'},{id:'sh33',name:'масло оливковое'},{id:'sh34',name:'масло растительное'},{id:'sh35',name:'соевый соус'},{id:'sh36',name:'соль, сахар, перец'},{id:'sh37',name:'специи',note:'паприка, куркума, лавровый лист'}]},
+];
+function getShopData(){try{const d=JSON.parse(localStorage.getItem('shop_struct'));return d||JSON.parse(JSON.stringify(DEFAULT_SHOP));}catch(e){return JSON.parse(JSON.stringify(DEFAULT_SHOP));}}
+function saveShopData(d){localStorage.setItem('shop_struct',JSON.stringify(d));}
+let SS=JSON.parse(localStorage.getItem('ss')||'{}');
+function saveS(){localStorage.setItem('ss',JSON.stringify(SS));}
+let shopEM=false;
+function togShopEdit(){
+  shopEM=!shopEM;
+  const btn=document.getElementById('sh-edit-btn');
+  btn.textContent=shopEM?'✓ готово':'✏ изменить';
+  btn.classList.toggle('on',shopEM);
+  renderShop();
+}
+function renderShop(){
+  const SHOP=getShopData();const c=document.getElementById('shoplist');c.innerHTML='';
+  let tot=0,dn=0;
+  SHOP.forEach((sec,si)=>{
+    const div=document.createElement('div');div.className='ss';
+    const hdr=document.createElement('div');hdr.className='ssh';
+    hdr.innerHTML=`<span>${sec.name}</span>${shopEM?`<button class="sh-sec-del" onclick="delShSec(${si})" title="удалить раздел">×</button>`:''}`;
+    div.appendChild(hdr);
+    sec.items.forEach((it,ii)=>{
+      tot++;if(SS[it.id])dn++;
+      const el=document.createElement('div');el.className='si'+(SS[it.id]?' ck':'');
+      if(!shopEM){
+        el.tabIndex=0;
+        el.onclick=()=>{SS[it.id]=!SS[it.id];saveS();renderShop();};
+        el.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();el.click();}};
+      }
+      el.innerHTML=`${!shopEM?'<div class="sqr"></div>':''}<div class="sr2"><div class="sn">${it.name}</div>${it.note?`<div class="sno">${it.note}</div>`:''}</div>${it.qty?`<div class="sq">${it.qty}</div>`:''}${shopEM?`<button class="sh-del-btn" onclick="delShItem(${si},${ii})" title="удалить">×</button>`:''}`;
+      div.appendChild(el);
+    });
+    if(shopEM){
+      const addRow=document.createElement('div');addRow.className='sh-add-row';
+      addRow.innerHTML=`<input class="si-name" id="sh-n-${si}" placeholder="товар" style="flex:1;min-width:100px"><input class="si-qty" id="sh-q-${si}" placeholder="кол-во" style="width:80px"><button class="add-evt" style="font-size:12px;padding:5px 10px;flex-shrink:0" onclick="addShItem(${si})">+</button>`;
+      div.appendChild(addRow);
+    }
+    c.appendChild(div);
+  });
+  if(shopEM){
+    const addSec=document.createElement('button');
+    addSec.style.cssText='width:100%;border:1px dashed var(--bd);border-radius:8px;padding:10px;font-size:13px;color:var(--ac);background:none;cursor:pointer;font-family:Jost,sans-serif;margin-top:8px;';
+    addSec.textContent='+ новый раздел';
+    addSec.onclick=()=>{const name=prompt('название раздела');if(!name)return;const SHOP=getShopData();SHOP.push({id:'sec'+Date.now(),name,items:[]});saveShopData(SHOP);renderShop();};
+    c.appendChild(addSec);
+  }
+  document.getElementById('sp').textContent=dn+' из '+tot+' куплено';
+}
+function addShItem(si){
+  const nameEl=document.getElementById('sh-n-'+si);const qtyEl=document.getElementById('sh-q-'+si);
+  const name=(nameEl?.value||'').trim();if(!name)return;
+  const qty=(qtyEl?.value||'').trim();
+  const SHOP=getShopData();SHOP[si].items.push({id:'sh'+Date.now(),name,qty});
+  saveShopData(SHOP);renderShop();
+}
+function delShItem(si,ii){
+  const SHOP=getShopData();SHOP[si].items.splice(ii,1);saveShopData(SHOP);renderShop();
+}
+function delShSec(si){
+  if(!confirm('удалить раздел?'))return;
+  const SHOP=getShopData();SHOP.splice(si,1);saveShopData(SHOP);renderShop();
+}
+function resetShop(){SS={};saveS();renderShop();}
+renderShop();
+
+// ── JOURNAL ────────────────────────────────────────────
+const EMOTIONS=[
+  {id:'anger',label:'ГНЕВ',color:'#D94F4F',tc:'#fff',subs:[
+    {label:'бешенство'},{label:'ярость'},{label:'ненависть'},{label:'истерия'},{label:'злость'},
+    {label:'раздражение'},{label:'презрение'},{label:'негодование'},{label:'обида'},{label:'ревность'},
+    {label:'уязвлённость'},{label:'досада'},{label:'зависть'},{label:'неприязнь'},{label:'возмущение'},{label:'отвращение'}
+  ]},
+  {id:'fear',label:'СТРАХ',color:'#E8924A',tc:'#fff',subs:[
+    {label:'ужас'},{label:'отчаяние'},{label:'испуг'},{label:'оцепенение'},{label:'подозрение'},
+    {label:'тревога'},{label:'ошарашенность'},{label:'беспокойство'},{label:'боязнь'},{label:'унижение'},
+    {label:'замешательство'},{label:'растерянность'},{label:'вина'},{label:'стыд'},{label:'сомнение'},
+    {label:'застенчивость'},{label:'опасение'},{label:'смущение'},{label:'сломленность'},{label:'надменность'},{label:'ошеломлённость'}
+  ]},
+  {id:'sadness',label:'ГРУСТЬ',color:'#7B6EBF',tc:'#fff',subs:[
+    {label:'горечь'},{label:'тоска'},{label:'скорбь'},{label:'лень'},{label:'жалость'},
+    {label:'отрешённость'},{label:'беспомощность'},{label:'душевная боль'},{label:'безнадёжность'},
+    {label:'отчуждённость'},{label:'разочарование'},{label:'потрясение'},{label:'сожаление'},
+    {label:'скука'},{label:'безысходность'},{label:'печаль'},{label:'загнанность'}
+  ]},
+  {id:'joy',label:'РАДОСТЬ',color:'#4CAF7A',tc:'#fff',subs:[
+    {label:'счастье'},{label:'восторг'},{label:'ликование'},{label:'приподнятость'},{label:'оживление'},
+    {label:'умиротворение'},{label:'увлечение'},{label:'интерес'},{label:'забота'},{label:'ожидание'},
+    {label:'возбуждение'},{label:'предвкушение'},{label:'надежда'},{label:'любопытство'},
+    {label:'освобождение'},{label:'принятие'},{label:'нетерпение'},{label:'вера'},{label:'изумление'}
+  ]},
+  {id:'love',label:'ЛЮБОВЬ',color:'#D4608B',tc:'#fff',subs:[
+    {label:'нежность'},{label:'теплота'},{label:'сочувствие'},{label:'блаженство'},{label:'доверие'},
+    {label:'безопасность'},{label:'благодарность'},{label:'спокойствие'},{label:'симпатия'},
+    {label:'гордость'},{label:'восхищение'},{label:'уважение'},{label:'самоценность'},
+    {label:'влюблённость'},{label:'любовь к себе'},{label:'очарованность'},{label:'искренность'},
+    {label:'дружелюбие'},{label:'доброта'},{label:'взаимовыручка'}
+  ]}
+];
+const THOUGHTS=[
+  'нервозность','пренебрежение','недовольство','вредность','огорчение','нетерпимость','вседозволенность',
+  'раскаяние','безвыходность','превосходство','высокомерие','неполноценность','неудобство','неловкость','апатия','неуверенность',
+  'тупик','усталость','принуждение','одиночество','отверженность','подавленность','холодность','безучастность','равнодушие',
+  'удовлетворение','уверенность','довольство','окрылённость','торжественность','жизнерадостность','облегчение','ободрённость','удивление',
+  'сопереживание','сопричастность','уравновешенность','смирение','естественность','жизнелюбие','вдохновение','воодушевление'
+];
+const FEARS=['оценки','ошибки','нового','одиночества','ответственности','темноты','высоты','разочарования в себе','будущего','за свою жизнь'];
+const MOOD_BLOCKS=[
+  {id:'energy',name:'энергия',color:'#4CAF7A',opts:[{label:'полна сил',emoji:'⚡'},{label:'нормально',emoji:'🙂'},{label:'устала',emoji:'😴'},{label:'совсем нет сил',emoji:'🪫'}]},
+  {id:'body',name:'тело',color:'#4A90D4',opts:[{label:'хорошо',emoji:'💪'},{label:'нормально',emoji:'🙆'},{label:'болит',emoji:'🤕'},{label:'очень плохо',emoji:'😷'}]},
+  {id:'social',name:'общение',color:'#D4608B',opts:[{label:'хочу общаться',emoji:'💬'},{label:'нейтрально',emoji:'🤷'},{label:'хочу побыть одной',emoji:'🚪'},{label:'одиноко',emoji:'🌑'}]},
+];
+let emExpanded={};
+let jDate=td(),jTipTimer=null;
+function jGoToday(){jDate=td();renderJournal();}
+function jShift(d){const dd=pd(jDate);dd.setDate(dd.getDate()+d);if(dd>new Date())return;jDate=fd(dd);renderJournal();}
+function getJData(ds){try{return JSON.parse(localStorage.getItem('j_'+ds)||'{}');}catch(e){return{};}}
+function saveJData(ds,data){localStorage.setItem('j_'+ds,JSON.stringify(data));}
+function toggleJArr(key,value){
+  const data=getJData(jDate);
+  if(!data[key])data[key]=[];
+  const idx=data[key].indexOf(value);
+  if(idx>=0)data[key].splice(idx,1);else data[key].push(value);
+  saveJData(jDate,data);renderJournal();
+}
+function renderJournal(){
+  const MR2=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  const DF2=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+  const d=pd(jDate);
+  document.getElementById('jdlbl').textContent=d.getDate()+' '+MR2[d.getMonth()]+', '+DF2[d.getDay()];
+  const data=getJData(jDate);
+  const mb=document.getElementById('mood-blocks');mb.innerHTML='';
+  const selEm=data.emotions||[];
+  const selTh=data.thoughts||[];
+  const selFe=data.fears||[];
+
+  // Summary chips
+  if(selEm.length||selTh.length||selFe.length){
+    const sum=document.createElement('div');sum.className='em-sel-summary';
+    selEm.forEach(lbl=>{
+      let col='var(--ac)';
+      for(const em of EMOTIONS){if(em.subs.find(s=>s.label===lbl)){col=em.color;break;}}
+      const chip=document.createElement('button');chip.className='em-chip';chip.style.background=col;chip.textContent='× '+lbl;
+      chip.onclick=()=>toggleJArr('emotions',lbl);sum.appendChild(chip);
+    });
+    selTh.forEach(lbl=>{
+      const chip=document.createElement('button');chip.className='em-chip';chip.style.background='#8B7FD4';chip.textContent='× '+lbl;
+      chip.onclick=()=>toggleJArr('thoughts',lbl);sum.appendChild(chip);
+    });
+    selFe.forEach(lbl=>{
+      const chip=document.createElement('button');chip.className='em-chip';chip.style.background='#E8924A';chip.textContent='× '+lbl;
+      chip.onclick=()=>toggleJArr('fears',lbl);sum.appendChild(chip);
+    });
+    mb.appendChild(sum);
+  }
+
+  // Emotion categories
+  EMOTIONS.forEach(em=>{
+    const isExp=!!emExpanded[em.id];
+    const count=selEm.filter(lbl=>em.subs.find(s=>s.label===lbl)).length;
+    const sec=document.createElement('div');sec.className='em-section';
+    if(count>0)sec.style.borderColor=em.color+'88';
+    const hdr=document.createElement('div');hdr.className='em-cat-hdr';
+    const dot=document.createElement('span');dot.className='em-dot';dot.style.background=em.color;
+    const nm=document.createElement('span');nm.className='em-cat-name';nm.textContent=em.label;
+    const arr=document.createElement('span');arr.className='em-arr'+(isExp?' op':'');arr.textContent='⌄';
+    hdr.appendChild(dot);hdr.appendChild(nm);
+    if(count>0){const cnt=document.createElement('span');cnt.className='em-cnt';cnt.style.background=em.color;cnt.textContent=count;hdr.appendChild(cnt);}
+    hdr.appendChild(arr);
+    hdr.onclick=()=>{emExpanded[em.id]=!emExpanded[em.id];renderJournal();};
+    sec.appendChild(hdr);
+    if(isExp){
+      const pw=document.createElement('div');pw.className='em-pills-wrap';
+      em.subs.forEach(sub=>{
+        const isSel=selEm.includes(sub.label);
+        const btn=document.createElement('button');btn.className='em-pill'+(isSel?' sel':'');
+        if(isSel){btn.style.background=em.color;btn.style.borderColor=em.color;}
+        btn.textContent=sub.label;btn.onclick=()=>toggleJArr('emotions',sub.label);
+        pw.appendChild(btn);
+      });
+      sec.appendChild(pw);
+    }
+    mb.appendChild(sec);
+  });
+
+  // Thoughts
+  const tsec=document.createElement('div');tsec.className='tf-block';tsec.style.marginTop='8px';
+  const tnm=document.createElement('div');tnm.className='tf-block-name';tnm.textContent='мысли и состояния';
+  const tpw=document.createElement('div');tpw.className='tf-pills';
+  THOUGHTS.forEach(t=>{
+    const isSel=selTh.includes(t);
+    const btn=document.createElement('button');btn.className='tf-pill'+(isSel?' sel':'');
+    if(isSel)btn.style.background='#8B7FD4';
+    btn.textContent=t;btn.onclick=()=>toggleJArr('thoughts',t);tpw.appendChild(btn);
+  });
+  tsec.appendChild(tnm);tsec.appendChild(tpw);mb.appendChild(tsec);
+
+  // Fears
+  const fsec=document.createElement('div');fsec.className='tf-block';
+  const fnm=document.createElement('div');fnm.className='tf-block-name';fnm.textContent='страхи';
+  const fpw=document.createElement('div');fpw.className='tf-pills';
+  FEARS.forEach(f=>{
+    const isSel=selFe.includes(f);
+    const btn=document.createElement('button');btn.className='tf-pill'+(isSel?' sel':'');
+    if(isSel)btn.style.background='#E8924A';
+    btn.textContent=f;btn.onclick=()=>toggleJArr('fears',f);fpw.appendChild(btn);
+  });
+  fsec.appendChild(fnm);fsec.appendChild(fpw);mb.appendChild(fsec);
+
+  // State blocks
+  const stLbl=document.createElement('div');stLbl.className='jsec-title';stLbl.style.marginTop='1.25rem';stLbl.textContent='состояние';mb.appendChild(stLbl);
+  MOOD_BLOCKS.forEach(block=>{
+    const div=document.createElement('div');div.className='mblock';
+    div.innerHTML=`<div class="mblock-name">${block.name}</div><div class="moptions" id="mb-${block.id}"></div>`;
+    mb.appendChild(div);
+    const row=document.getElementById('mb-'+block.id);
+    block.opts.forEach(opt=>{
+      const btn=document.createElement('button');
+      const isSel=data.mood&&data.mood[block.id]===opt.label;
+      btn.className='mopt'+(isSel?' sel':'');if(isSel)btn.style.background=block.color;
+      btn.innerHTML=`<span>${opt.emoji}</span><span>${opt.label}</span>`;
+      btn.onclick=()=>{if(!data.mood)data.mood={};data.mood[block.id]=data.mood[block.id]===opt.label?null:opt.label;saveJData(jDate,data);renderJournal();};
+      row.appendChild(btn);
+    });
+  });
+
+  const jt=document.getElementById('jtext');jt.value=data.text||'';
+  jt.oninput=()=>{document.getElementById('jsaved').textContent='';};
+  document.getElementById('jsaved').textContent=data.text?'сохранено':'';
+}
+function saveJournal(){
+  const data=getJData(jDate);data.text=document.getElementById('jtext').value;
+  saveJData(jDate,data);document.getElementById('jsaved').textContent='сохранено ✓';
+}
+
+// ── HABITS ─────────────────────────────────────────────
+function getHabits(){try{return JSON.parse(localStorage.getItem('habits')||'[]');}catch(e){return[];}}
+function saveHabits(h){localStorage.setItem('habits',JSON.stringify(h));}
+function addHabit(){
+  const name=document.getElementById('hname-in').value.trim();if(!name)return;
+  const habits=getHabits();habits.push({id:'h'+Date.now(),name,created:td()});
+  saveHabits(habits);document.getElementById('hname-in').value='';renderHabits();
+}
+function delHabit(id){saveHabits(getHabits().filter(h=>h.id!==id));localStorage.removeItem('hd_'+id);renderHabits();}
+function togHabitDay(hid,ds){
+  const key='hd_'+hid;let done;try{done=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){done=[];}
+  const i=done.indexOf(ds);if(i>=0)done.splice(i,1);else done.push(ds);
+  localStorage.setItem(key,JSON.stringify(done));renderHabits();
+}
+function showDotTip(ds){
+  const MR3=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+  const DF3=['вс','пн','вт','ср','чт','пт','сб'];
+  const d=pd(ds);const tip=document.getElementById('dot-tip');
+  tip.textContent=DF3[d.getDay()]+', '+d.getDate()+' '+MR3[d.getMonth()];
+  tip.style.display='block';if(jTipTimer)clearTimeout(jTipTimer);
+  jTipTimer=setTimeout(()=>{tip.style.display='none';},1800);
+}
+function renderHabits(){
+  const habits=getHabits();const con=document.getElementById('habits-con');con.innerHTML='';
+  if(!habits.length){con.innerHTML='<div style="font-size:13px;color:var(--hi);padding:.5rem 0">добавь первую привычку выше</div>';return;}
+  const now=new Date();const yr=now.getFullYear(),mo=now.getMonth();
+  const daysInMonth=new Date(yr,mo+1,0).getDate();const todayStr=td();
+  habits.forEach(h=>{
+    let done;try{done=JSON.parse(localStorage.getItem('hd_'+h.id)||'[]');}catch(e){done=[];}
+    let streak=0;for(let i=0;i<60;i++){const dd=new Date();dd.setDate(dd.getDate()-i);const ds=fd(dd);if(done.includes(ds))streak++;else break;}
+    const card=document.createElement('div');card.className='habit-card';
+    card.innerHTML=`<div class="hcard-top"><div class="hcard-left"><div class="hcard-name">${h.name}</div><div class="hcard-streak">${streak>0?'🔥 '+streak+' дней подряд':'начни сегодня'}</div></div><button class="hdel" onclick="delHabit('${h.id}')">×</button></div><div class="dot-grid" id="dg-${h.id}"></div>`;
+    con.appendChild(card);
+    const grid=document.getElementById('dg-'+h.id);
+    const fdDate=(d)=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    for(let day=1;day<=daysInMonth;day++){
+      const dd=new Date(yr,mo,day);const ds=fdDate(dd);
+      const isFuture=dd>now&&ds!==todayStr;const isToday=ds===todayStr;const isDone=done.includes(ds);
+      const dot=document.createElement('button');dot.className='hdot'+(isDone?' done':'')+(isToday?' today-dot':'')+(isFuture?' future':'');
+      dot.onclick=()=>{if(!isFuture){togHabitDay(h.id,ds);showDotTip(ds);}};
+      dot.onmouseenter=()=>{if(!isFuture)showDotTip(ds);};
+      grid.appendChild(dot);
+    }
+  });
+}
+
+// ── INIT ───────────────────────────────────────────────
+renderCal();
+askNotif().then(scheduleNotifs);
+</script>
+</body>
+</html>
